@@ -5,7 +5,7 @@ import ReactFlow, {
   applyNodeChanges,
 } from "react-flow-renderer";
 
-import TextUpdaterNode from "./TextUpdaterNode.js";
+import Subnet from "./subnet.js";
 
 import "./text-updater-node.css";
 import TableRow from "./TableRow.js";
@@ -145,7 +145,7 @@ const initialEdges = [
 // we define the nodeTypes outside of the component to prevent re-renderings
 // you could also use useMemo inside the component
 const nodeTypes = {
-  subnet: TextUpdaterNode,
+  subnet: Subnet,
   tableRow: TableRow,
   natGateway: NatGateway,
 };

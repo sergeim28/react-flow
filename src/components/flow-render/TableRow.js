@@ -1,17 +1,8 @@
-import { useCallback, useRef } from "react";
 import { Handle, Position } from "react-flow-renderer";
 
-const handleStyle = { top: 100 };
-
-function TableRow({ id }) {
-  const onChange = useCallback((evt) => {
-    console.log(evt.target.value);
-  }, []);
-  const target1 = useRef(null);
-
+function TableRow() {
   return (
     <div style={{ width: 100, border: "1px solid black" }}>
-      {/* <Handle type="target" position={Position.Top} /> */}
       <div style={{ display: "flex" }}>
         <div
           style={{

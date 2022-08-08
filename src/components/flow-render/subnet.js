@@ -1,14 +1,4 @@
-import { useCallback, useRef } from "react";
-import { Handle, Position } from "react-flow-renderer";
-
-const handleStyle = { top: 100 };
-
-function TextUpdaterNode({ data, children }) {
-  const onChange = useCallback((evt) => {
-    console.log(evt.target.value);
-  }, []);
-  const target1 = useRef(null);
-
+function Subnet() {
   return (
     <div
       style={{
@@ -33,4 +23,4 @@ function TextUpdaterNode({ data, children }) {
   );
 }
 
-export default TextUpdaterNode;
+export default Subnet;
