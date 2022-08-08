@@ -1,27 +1,170 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import ReactFlow, {
   addEdge,
-  MiniMap,
-  Controls,
-  Background,
-  useNodesState,
-  useEdgesState,
+  applyEdgeChanges,
+  applyNodeChanges,
 } from "react-flow-renderer";
 
-import {
-  nodes as initialNodes,
-  edges as initialEdges,
-} from "./initial-elements";
+import TextUpdaterNode from "./TextUpdaterNode.js";
 
-const onInit = (reactFlowInstance) =>
-  console.log("flow loaded:", reactFlowInstance);
+import "./text-updater-node.css";
+import TableRow from "./TableRow.js";
+import NatGateway from "./NatGateway.js";
 
-const FlowRender = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+const rfStyle = {
+  backgroundColor: "#B8CEFF",
+  fontSize: 8,
+};
+
+const initialNodes = [
+  {
+    id: "A",
+    type: "subnet",
+    position: { x: -200, y: 50 },
+  },
+  {
+    id: "A-1",
+    type: "tableRow",
+    position: { x: 10, y: 80 },
+    parentNode: "A",
+    extent: "parent",
+  },
+  {
+    id: "A-2",
+    type: "tableRow",
+    position: { x: 10, y: 92 },
+    parentNode: "A",
+    extent: "parent",
+  },
+  {
+    id: "A-3",
+    type: "natGateway",
+    position: { x: 25, y: 120 },
+    parentNode: "A",
+    extent: "parent",
+  },
+  {
+    id: "B",
+    type: "output",
+    position: { x: 400, y: 200 },
+    data: null,
+    style: {
+      width: 170,
+      height: 140,
+      backgroundColor: "rgba(240,240,240,0.25)",
+    },
+  },
+  {
+    id: "B-1",
+    data: { label: "Child 1" },
+    position: { x: 50, y: 10 },
+    parentNode: "B",
+    extent: "parent",
+    draggable: false,
+    style: {
+      width: 60,
+    },
+  },
+  {
+    id: "B-2",
+    data: { label: "Child 2" },
+    position: { x: 10, y: 90 },
+    parentNode: "B",
+    extent: "parent",
+    draggable: false,
+    style: {
+      width: 60,
+    },
+  },
+  {
+    id: "B-3",
+    data: { label: "Child 3" },
+    position: { x: 100, y: 90 },
+    parentNode: "B",
+    extent: "parent",
+    draggable: false,
+    style: {
+      width: 60,
+    },
+  },
+  {
+    id: "D",
+    type: "subnet",
+    position: { x: 200, y: -200 },
+  },
+  {
+    id: "D-1",
+    type: "tableRow",
+    position: { x: 10, y: 80 },
+    parentNode: "D",
+    extent: "parent",
+  },
+  {
+    id: "D-2",
+    type: "tableRow",
+    position: { x: 10, y: 92 },
+    parentNode: "D",
+    extent: "parent",
+  },
+  {
+    id: "D-3",
+    type: "natGateway",
+    position: { x: 25, y: 120 },
+    parentNode: "D",
+    extent: "parent",
+  },
+];
+
+const initialEdges = [
+  {
+    id: "a1-a2",
+    source: "A-2",
+    target: "B-2",
+    type: "step",
+    markerStart: { type: "arrow" },
+    markerEnd: { type: "arrowclosed" },
+  },
+  {
+    id: "a1-b3",
+    source: "A-1",
+    target: "B-3",
+    type: "step",
+    markerStart: { type: "arrow" },
+    markerEnd: { type: "arrowclosed" },
+  },
+  {
+    id: "a1-d3",
+    source: "A-1",
+    target: "D-2",
+    type: "step",
+    markerStart: { type: "arrow" },
+    markerEnd: { type: "arrowclosed" },
+  },
+];
+
+// we define the nodeTypes outside of the component to prevent re-renderings
+// you could also use useMemo inside the component
+const nodeTypes = {
+  subnet: TextUpdaterNode,
+  tableRow: TableRow,
+  natGateway: NatGateway,
+};
+
+function Flow() {
+  const [nodes, setNodes] = useState(initialNodes);
+  const [edges, setEdges] = useState(initialEdges);
+
+  const onNodesChange = useCallback(
+    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    [setNodes]
+  );
+  const onEdgesChange = useCallback(
+    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+    [setEdges]
+  );
   const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    []
+    (connection) => setEdges((eds) => addEdge(connection, eds)),
+    [setEdges]
   );
 
   return (
@@ -31,30 +174,12 @@ const FlowRender = () => {
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
-      onInit={onInit}
+      nodeTypes={nodeTypes}
       fitView
-      attributionPosition="top-right"
-    >
-      <MiniMap
-        nodeStrokeColor={(n) => {
-          if (n.style?.background) return n.style.background;
-          if (n.type === "input") return "#0041d0";
-          if (n.type === "output") return "#ff0072";
-          if (n.type === "default") return "#1a192b";
-
-          return "#eee";
-        }}
-        nodeColor={(n) => {
-          if (n.style?.background) return n.style.background;
-
-          return "#fff";
-        }}
-        nodeBorderRadius={2}
-      />
-      <Controls />
-      <Background color="#aaa" gap={16} />
-    </ReactFlow>
+      style={rfStyle}
+      connectionMode="loose"
+    />
   );
-};
+}
 
-export default FlowRender;
+export default Flow;
